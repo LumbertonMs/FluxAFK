@@ -6,8 +6,8 @@
     "type": "offline"
   },
   "server": {
-    "ip": "ShadoWarSMP.aternos.me",
-    "port": 36622,
+    "ip": "fluxnetwork.mcsh.io",
+    "port": 10980,
     "version": "",
     "try-creative": false
   },
