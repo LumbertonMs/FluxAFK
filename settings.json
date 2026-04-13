@@ -6,7 +6,7 @@
     "type": "offline"
   },
   "server": {
-    "ip": "fluxmcnetwork.mcsh.io",
+    "ip": "191.96.231.16",
     "port": 10980,
     "version": "",
     "try-creative": false
