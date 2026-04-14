@@ -1,3 +1,12 @@
+"use strict";
+
+const { addLog, getLogs } = require("./logger");
+const mineflayer = require("mineflayer");
+const { Movements, pathfinder, goals } = require("mineflayer-pathfinder");
+const { GoalBlock } = goals;
+const config = require("./settings.json");
+const express = require("express");
+const http = require("http");
 const https = require("https");
 
 // ============================================================
@@ -8,13 +17,3 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 // Bot state tracking
-let botState = {
-  connected: false,
-  lastActivity: Date.now(),
-  reconnectAttempts: 0,
-  startTime: Date.now(),
-  errors: [],
-  wasThrottled: false,
-};
-
-// Health check endpoint for monitoring

@@ -259,6 +259,70 @@ app.get('/', (req, res) => {
           }
           .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-accent); }
 
+          .control-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 16px;
+            margin-bottom: 28px;
+          }
+          .control-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius); padding: 24px;
+            box-shadow: var(--shadow-card);
+          }
+          .control-card-header { margin-bottom: 18px; }
+          .control-card-header h3 { margin: 0 0 4px; font-size: 16px; font-weight: 800; }
+          .control-card-header p { margin: 0; font-size: 12px; color: var(--text-muted); }
+          .control-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+          .chat-panel { margin-top: 14px; }
+          .chat-label { display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 10px; }
+          .chat-input {
+            width: 100%; min-height: 110px; background: var(--bg-surface);
+            border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+            color: var(--text-primary); padding: 14px 16px;
+            font-family: var(--font-mono); font-size: 13px; resize: vertical;
+          }
+          .chat-actions {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
+          }
+          .status-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 14px; margin-top: 18px;
+          }
+          .status-item {
+            background: var(--bg-surface); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm); padding: 14px;
+          }
+          .status-item .status-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.7px; }
+          .status-item strong { display: block; margin-top: 8px; font-size: 20px; color: var(--text-primary); }
+          .control-note { margin-top: 18px; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+
+          .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+          }
+          .modal-overlay.visible { opacity: 1; pointer-events: auto; }
+          .modal {
+            width: min(520px, calc(100% - 40px)); background: var(--bg-card);
+            border: 1px solid var(--border-accent); border-radius: var(--radius);
+            padding: 26px 28px; box-shadow: var(--shadow-card);
+          }
+          .modal h3 { margin: 0 0 10px; font-size: 18px; }
+          .modal p { margin: 0 0 22px; color: var(--text-secondary); line-height: 1.7; }
+          .modal-actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+
+          .toast {
+            position: fixed; right: 22px; bottom: 22px; min-width: 240px;
+            padding: 14px 18px; border-radius: 16px;
+            font-size: 13px; font-weight: 600; color: #fff;
+            opacity: 0; transform: translateY(12px); transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 999;
+          }
+          .toast.success { background: rgba(52,211,153,0.95); }
+          .toast.error { background: rgba(248,113,113,0.95); }
+          .toast.visible { opacity: 1; transform: translateY(0); }
+
           /* ——— Responsive ——— */
           @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -333,16 +397,65 @@ app.get('/', (req, res) => {
                 <div class="stat-sub">Current coordinates</div>
               </div>
               <div class="stat-tile">
-                <div class="stat-icon">🔄</div>
-                <div class="stat-label">Reconnects</div>
-                <div class="stat-value" id="reconnect-text">0</div>
-                <div class="stat-sub">Since startup</div>
+                <div class="stat-icon">🤖</div>
+                <div class="stat-label">Bots</div>
+                <div class="stat-value" id="connected-bots-text">${getConnectedBotCount()}</div>
+                <div class="stat-sub" id="bot-count-sub">of ${getTotalBotCount()} connected</div>
               </div>
               <div class="stat-tile">
                 <div class="stat-icon">💾</div>
                 <div class="stat-label">Memory</div>
                 <div class="stat-value" id="memory-text">—</div>
                 <div class="stat-sub">Heap usage</div>
+              </div>
+            </div>
+
+            <div class="section-title">Bot Control <span class="section-badge">${getConnectedBotCount()}/${getTotalBotCount()} active</span></div>
+            <div class="control-grid">
+              <div class="control-card">
+                <div class="control-card-header">
+                  <h3>Quick Controls</h3>
+                  <p>Start, stop and send text or commands to your bot(s).</p>
+                </div>
+                <div class="control-actions">
+                  <button class="btn btn-start" onclick="showConfirm('start')">▶ Start Bot(s)</button>
+                  <button class="btn btn-stop" onclick="showConfirm('stop')">■ Stop Bot(s)</button>
+                </div>
+                <label class="chat-label" for="chat-input">Send chat / command</label>
+                <div class="chat-panel">
+                  <textarea id="chat-input" class="chat-input" placeholder="Type a command or chat message…"></textarea>
+                  <div class="chat-actions">
+                    <button type="button" class="btn btn-ghost" onclick="sendDashboardCommand('/help')">/help</button>
+                    <button type="button" class="btn btn-ghost" onclick="sendDashboardCommand('/status')">/status</button>
+                    <button type="button" class="btn btn-ghost" onclick="sendDashboardCommand('/pos')">/pos</button>
+                    <button type="button" class="btn btn-start" onclick="sendDashboardText()">Send</button>
+                  </div>
+                </div>
+              </div>
+              <div class="control-card status-card">
+                <div class="control-card-header">
+                  <h3>Bot Summary</h3>
+                  <p>Live connection information for your current bot pool.</p>
+                </div>
+                <div class="status-grid">
+                  <div class="status-item">
+                    <span class="status-label">Total bots</span>
+                    <strong id="total-bots-text">${getTotalBotCount()}</strong>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Connected</span>
+                    <strong id="connected-bots-status">${getConnectedBotCount()}</strong>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Last activity</span>
+                    <strong id="last-activity-text">—</strong>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Server version</span>
+                    <strong>${config.server.version || 'auto'}</strong>
+                  </div>
+                </div>
+                <p class="control-note">Multi-bot mode works best with offline/noauth accounts. Adjust <code>server.count</code> in settings.json.</p>
               </div>
             </div>
 
@@ -383,6 +496,20 @@ app.get('/', (req, res) => {
           </main>
         </div>
 
+        <div id="confirm-modal" class="modal-overlay" onclick="if (event.target === this) hideConfirm()">
+          <div class="modal" role="dialog" aria-modal="true">
+            <h3 id="confirm-title">Confirm action</h3>
+            <p id="confirm-text">Are you sure you want to continue?</p>
+            <input type="hidden" id="confirm-action" value="">
+            <div class="modal-actions">
+              <button type="button" class="btn btn-ghost" onclick="hideConfirm()">Cancel</button>
+              <button type="button" id="confirm-submit" class="btn btn-start" onclick="submitConfirm()">Confirm</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
         <script>
           function formatUptime(s) {
             var h = Math.floor(s / 3600);
@@ -408,7 +535,17 @@ app.get('/', (req, res) => {
               dot.className    = 'status-dot '    + (online ? 'online' : 'offline');
               dot.textContent  = online ? '✓' : '✗';
               label.textContent = online ? 'Connected' : 'Disconnected';
-              detail.textContent = online ? 'Bot is active on the server' : 'Attempting to reconnect…';
+              detail.textContent = online
+                ? data.connectedBots + '/' + data.totalBots + ' bots active'
+                : 'Attempting to reconnect…';
+
+              document.getElementById('total-bots-text').textContent = data.totalBots;
+              document.getElementById('connected-bots-text').textContent = data.connectedBots;
+              document.getElementById('connected-bots-status').textContent = data.connectedBots;
+              document.getElementById('bot-count-sub').textContent = 'of ' + data.totalBots + ' connected';
+              document.getElementById('last-activity-text').textContent = data.lastActivity
+                ? formatUptime(Math.floor((Date.now() - data.lastActivity) / 1000))
+                : '—';
 
               document.getElementById('uptime-text').textContent = formatUptime(data.uptime);
               document.getElementById('reconnect-text').textContent = data.reconnectAttempts || '0';
@@ -427,18 +564,83 @@ app.get('/', (req, res) => {
             }
           }
 
-          async function startBot() {
-            var r = await fetch('/start', { method: 'POST' });
-            var data = await r.json();
-            alert(data.success ? 'Bot started!' : data.msg);
+          function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = 'toast visible ' + (type === 'error' ? 'error' : 'success');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(function () {
+              toast.className = 'toast';
+            }, 3200);
+          }
+
+          function showConfirm(action) {
+            var modal = document.getElementById('confirm-modal');
+            var title = document.getElementById('confirm-title');
+            var text = document.getElementById('confirm-text');
+            var button = document.getElementById('confirm-submit');
+            document.getElementById('confirm-action').value = action;
+            modal.classList.add('visible');
+            if (action === 'start') {
+              title.textContent = 'Start Bot(s)';
+              text.textContent = 'Start all configured bot instances and connect to the server.';
+              button.textContent = 'Start';
+              button.className = 'btn btn-start';
+            } else {
+              title.textContent = 'Stop Bot(s)';
+              text.textContent = 'Stop all running bots and clear their current session.';
+              button.textContent = 'Stop';
+              button.className = 'btn btn-stop';
+            }
+          }
+
+          function hideConfirm() {
+            document.getElementById('confirm-modal').classList.remove('visible');
+          }
+
+          async function submitConfirm() {
+            var action = document.getElementById('confirm-action').value;
+            var button = document.getElementById('confirm-submit');
+            button.disabled = true;
+            var response = await fetch(action === 'start' ? '/start' : '/stop', {
+              method: 'POST',
+            });
+            var data = await response.json();
+            showToast(data.success ? (action === 'start' ? 'Starting bot(s)...' : 'Stopping bot(s)...') : data.msg, data.success ? 'success' : 'error');
+            hideConfirm();
+            button.disabled = false;
             update();
           }
 
-          async function stopBot() {
-            var r = await fetch('/stop', { method: 'POST' });
-            var data = await r.json();
-            alert(data.success ? 'Bot stopped!' : data.msg);
-            update();
+          async function sendCommand(text) {
+            if (!text) {
+              showToast('Type a command or chat message first.', 'error');
+              return;
+            }
+            var response = await fetch('/command', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ command: text }),
+            });
+            var data = await response.json();
+            showToast(data.success ? 'Sent to bot(s)' : data.msg, data.success ? 'success' : 'error');
+          }
+
+          function sendDashboardCommand(command) {
+            document.getElementById('chat-input').value = command;
+            sendDashboardText();
+          }
+
+          function sendDashboardText() {
+            var input = document.getElementById('chat-input');
+            var text = input.value.trim();
+            if (!text) {
+              showToast('Type a message or command first.', 'error');
+              return;
+            }
+            input.value = '';
+            sendCommand(text);
           }
 
           setInterval(update, 5000);
@@ -641,10 +843,12 @@ app.get("/health", (req, res) => {
   res.json({
     status: botState.connected ? "connected" : "disconnected",
     uptime: Math.floor((Date.now() - botState.startTime) / 1000),
-    coords: bot && bot.entity ? bot.entity.position : null,
+    coords: getAnyBotCoords(),
     lastActivity: botState.lastActivity,
     reconnectAttempts: botState.reconnectAttempts,
     memoryUsage: process.memoryUsage().heapUsed / 1024 / 1024,
+    totalBots: getTotalBotCount(),
+    connectedBots: getConnectedBotCount(),
   });
 });
 
@@ -1001,11 +1205,7 @@ app.post("/stop", (req, res) => {
   if (!botRunning) return res.json({ success: false, msg: "Already stopped" });
 
   botRunning = false;
-
-  if (bot) {
-    bot.end();
-    bot = null;
-  }
+  stopAllBots();
 
   clearAllIntervals();
   addLog("[Control] Bot stopped");
@@ -1018,6 +1218,8 @@ app.post("/command", express.json(), (req, res) => {
   if (!cmd) return res.json({ success: false, msg: "Empty command." });
 
   addLog(`[Console] > ${cmd}`);
+
+  const activeBots = bots.filter((bot) => bot && bot.isConnected && typeof bot.chat === "function");
 
   if (cmd === "/help") {
     const lines = [
@@ -1035,38 +1237,51 @@ app.post("/command", express.json(), (req, res) => {
   }
 
   if (cmd === "/pos" || cmd === "/coords") {
-    const pos = bot && bot.entity ? bot.entity.position : null;
-    const msg = pos
-      ? `Position: X=${Math.floor(pos.x)}  Y=${Math.floor(pos.y)}  Z=${Math.floor(pos.z)}`
-      : "Position unavailable (bot not spawned).";
+    const connectedBots = bots.filter((bot) => bot && bot.isConnected && bot.entity);
+    if (!connectedBots.length) {
+      const msg = "Position unavailable (bot not spawned).";
+      addLog(`[Console] ${msg}`);
+      return res.json({ success: false, msg });
+    }
+
+    const lines = connectedBots.map((bot) => {
+      const pos = bot.entity.position;
+      return `${bot.__slotLabel}: X=${Math.floor(pos.x)} Y=${Math.floor(pos.y)} Z=${Math.floor(pos.z)}`;
+    });
+    const msg = `Position:\n${lines.join("\n")}`;
     addLog(`[Console] ${msg}`);
     return res.json({ success: true, msg });
   }
 
   if (cmd === "/status") {
-    const status = botState.connected ? "Connected" : "Disconnected";
+    const connected = getConnectedBotCount();
+    const total = getTotalBotCount();
     const uptime = Math.floor((Date.now() - botState.startTime) / 1000);
-    const msg = `Status: ${status} | Uptime: ${uptime}s | Reconnects: ${botState.reconnectAttempts}`;
+    const msg = `Status: ${connected}/${total} bots connected | Uptime: ${uptime}s | Reconnects: ${botState.reconnectAttempts}`;
     addLog(`[Console] ${msg}`);
     return res.json({ success: true, msg });
   }
 
-  if (!bot || typeof bot.chat !== "function") {
-    const msg = bot
-      ? "Bot is still connecting — try again in a moment."
-      : "Bot is not running.";
+  if (!activeBots.length) {
+    const msg = "Bot is not running or still connecting.";
     addLog(`[Console] ${msg}`);
     return res.json({ success: false, msg });
   }
 
-  try {
-    bot.chat(cmd);
-    addLog(`[Console] Sent to server: ${cmd}`);
-    return res.json({ success: true, msg: `Sent: ${cmd}` });
-  } catch (err) {
-    addLog(`[Console] Error: ${err.message}`);
-    return res.json({ success: false, msg: err.message });
-  }
+  const results = activeBots.map((bot) => {
+    try {
+      bot.chat(cmd);
+      return `${bot.__slotLabel}: Sent`;
+    } catch (err) {
+      return `${bot.__slotLabel}: ${err.message}`;
+    }
+  });
+
+  const error = results.some((line) => line.includes("Error"));
+  const message = results.join("\n");
+  if (!error) addLog(`[Console] Sent to ${activeBots.length} bot(s): ${cmd}`);
+
+  return res.json({ success: !error, msg: message });
 });
 
 // ============================================================
@@ -1142,11 +1357,41 @@ setInterval(
 // ============================================================
 // RECONNECTION & TIMEOUT MANAGEMENT
 // ============================================================
-let bot = null;
+let bots = [];
 let activeIntervals = [];
 let reconnectTimeoutId = null;
 let connectionTimeoutId = null;
 let isReconnecting = false;
+
+function getTotalBotCount() {
+  return Math.max(1, Number(config.server.count) || 1);
+}
+
+function getConnectedBotCount() {
+  return bots.filter((bot) => bot && bot.isConnected).length;
+}
+
+function getAnyBotCoords() {
+  const activeBot = bots.find((bot) => bot && bot.isConnected && bot.entity);
+  return activeBot ? activeBot.entity.position : null;
+}
+
+function stopAllBots() {
+  bots.forEach((bot) => {
+    try {
+      bot.removeAllListeners();
+      bot.end();
+    } catch (_) {
+      /* ignore */
+    }
+  });
+  bots = [];
+  botState.connected = false;
+}
+
+function updateGlobalConnectionState() {
+  botState.connected = getConnectedBotCount() > 0;
+}
 
 function clearBotTimeouts() {
   if (reconnectTimeoutId) {
@@ -1202,189 +1447,203 @@ function createBot() {
     return;
   }
 
-  // Cleanup previous bot properly to avoid ghost bots
-  if (bot) {
-    clearAllIntervals();
-    try {
-      bot.removeAllListeners();
-      bot.end();
-    } catch (e) {
-      addLog("[Cleanup] Error ending previous bot:", e.message);
-    }
-    bot = null;
+  stopAllBots();
+  clearAllIntervals();
+
+  const totalBots = getTotalBotCount();
+  const allowMultiBot =
+    config["bot-account"].type === "offline" ||
+    config["bot-account"].type === "noauth";
+  const actualBotCount = totalBots > 1 && !allowMultiBot ? 1 : totalBots;
+
+  if (totalBots > 1 && !allowMultiBot) {
+    addLog(
+      "[Bot] Multi-bot support requires offline auth or noauth. Starting one bot instead.",
+    );
   }
 
-  addLog(`[Bot] Creating bot instance...`);
+  addLog(`[Bot] Creating ${actualBotCount} bot instance(s)...`);
   addLog(`[Bot] Connecting to ${config.server.ip}:${config.server.port}`);
 
-  try {
-    // FIX: use version:false to auto-detect server version so the bot can join any server.
-    // If the user explicitly sets a version in settings.json it is still respected.
-    const botVersion =
-      config.server.version && config.server.version.trim() !== ""
-        ? config.server.version
-        : false;
-    bot = mineflayer.createBot({
-      username: config["bot-account"].username,
-      password: config["bot-account"].password || undefined,
-      auth: config["bot-account"].type,
-      host: config.server.ip,
-      port: config.server.port,
-      version: botVersion,
-      hideErrors: false,
-      checkTimeoutInterval: 600000,
-    });
-
-    bot.loadPlugin(pathfinder);
-
-    // FIX: connection timeout - end the old bot before reconnecting to avoid ghost bots
-    clearBotTimeouts();
-    connectionTimeoutId = setTimeout(() => {
-      if (!botState.connected) {
-        addLog("[Bot] Connection timeout - no spawn received");
-        try {
-          bot.removeAllListeners();
-          bot.end();
-        } catch (e) {
-          /* ignore */
-        }
-        bot = null;
-        scheduleReconnect();
-      }
-    }, 150000); // 150s - Aternos servers can take 90-120s to finish spawning a player
-
-    // FIX: guard against spawn firing twice (can happen on some servers)
-    let spawnHandled = false;
-
-    bot.once("spawn", () => {
-      if (spawnHandled) return;
-      spawnHandled = true;
-
-      clearBotTimeouts();
-      botState.connected = true;
-      botState.lastActivity = Date.now();
-      botState.reconnectAttempts = 0;
-      isReconnecting = false;
-
-      addLog(
-        `[Bot] [+] Successfully spawned on server! (Version: ${bot.version})`,
-      );
-      if (
-        config.discord &&
-        config.discord.events &&
-        config.discord.events.connect
-      ) {
-        sendDiscordWebhook(
-          `[+] **Connected** to \`${config.server.ip}\``,
-          0x4ade80,
-        );
-      }
-
-      // FIX: use bot.version (auto-detected) instead of config value so minecraft-data always matches
-      const mcData = require("minecraft-data")(bot.version);
-      const defaultMove = new Movements(bot, mcData);
-      defaultMove.allowFreeMotion = false;
-      defaultMove.canDig = false;
-      defaultMove.liquidCost = 1000;
-      defaultMove.fallDamageCost = 1000;
-
-      initializeModules(bot, mcData, defaultMove);
-
-      // Attempt creative mode (only works if bot has OP and enabled in settings)
-      setTimeout(() => {
-        if (bot && botState.connected && config.server["try-creative"]) {
-          bot.chat("/gamemode creative");
-          addLog("[INFO] Attempted to set creative mode (requires OP)");
-        }
-      }, 3000);
-
-      bot.on("messagestr", (message) => {
-        if (
-          message.includes("commands.gamemode.success.self") ||
-          message.includes("Set own game mode to Creative Mode")
-        ) {
-          addLog("[INFO] Bot is now in Creative Mode.");
-        }
-      });
-    });
-
-    // FIX: 'kicked' fires before 'end'. Remove the scheduleReconnect from 'kicked'
-    // so that 'end' is the single source of reconnect truth, preventing double-trigger.
-    bot.on("kicked", (reason) => {
-      // FIX: stringify reason if it's an object to make it readable in logs
-      const kickReason =
-        typeof reason === "object" ? JSON.stringify(reason) : reason;
-      addLog(`[Bot] Kicked: ${kickReason}`);
-      botState.connected = false;
-      botState.errors.push({
-        type: "kicked",
-        reason: kickReason,
-        time: Date.now(),
-      });
-      clearAllIntervals();
-
-      const reasonStr = String(kickReason).toLowerCase();
-      if (
-        reasonStr.includes("throttl") ||
-        reasonStr.includes("wait before reconnect") ||
-        reasonStr.includes("too fast")
-      ) {
-        addLog(
-          "[Bot] Throttle kick detected - will use extended reconnect delay",
-        );
-        botState.wasThrottled = true;
-      }
-
-      if (
-        config.discord &&
-        config.discord.events &&
-        config.discord.events.disconnect
-      ) {
-        sendDiscordWebhook(`[!] **Kicked**: ${kickReason}`, 0xff0000);
-      }
-      // NOTE: do NOT call scheduleReconnect() here - 'end' will fire right after 'kicked' and handle it
-    });
-
-    // FIX: 'end' is the single reconnect trigger
-    bot.on("end", (reason) => {
-      addLog(`[Bot] Disconnected: ${reason || "Unknown reason"}`);
-      botState.connected = false;
-      clearAllIntervals();
-      spawnHandled = false; // reset for next connection
-
-      if (
-        config.discord &&
-        config.discord.events &&
-        config.discord.events.disconnect
-      ) {
-        sendDiscordWebhook(
-          `[-] **Disconnected**: ${reason || "Unknown"}`,
-          0xf87171,
-        );
-      }
-
-      // ALWAYS reconnect — bot must never leave the server
-      scheduleReconnect();
-    });
-
-    bot.on("error", (err) => {
-      const msg = err.message || "";
-      addLog(`[Bot] Error: ${msg}`);
-      botState.errors.push({ type: "error", message: msg, time: Date.now() });
-      // Don't reconnect on error - let 'end' event handle it
-    });
-  } catch (err) {
-    addLog(`[Bot] Failed to create bot: ${err.message}`);
-    scheduleReconnect();
+  for (let slot = 1; slot <= actualBotCount; slot++) {
+    createBotInstance(slot, actualBotCount);
   }
+}
+
+function createBotInstance(slot, totalBots) {
+  // Cleanup previous instances before sliding into a new cluster.
+  if (bots.some((bot) => bot && bot.__slot === slot && bot.isConnected)) {
+    return;
+  }
+
+  const isMulti = totalBots > 1;
+  const baseUsername = config["bot-account"].username;
+  const username =
+    isMulti && config["bot-account"].type === "offline"
+      ? `${baseUsername}_${slot}`
+      : baseUsername;
+
+  const botVersion =
+    config.server.version && config.server.version.trim() !== ""
+      ? config.server.version
+      : false;
+
+  const bot = mineflayer.createBot({
+    username: username,
+    password: config["bot-account"].password || undefined,
+    auth: config["bot-account"].type,
+    host: config.server.ip,
+    port: config.server.port,
+    version: botVersion,
+    hideErrors: false,
+    checkTimeoutInterval: 600000,
+  });
+
+  bot.__slot = slot;
+  bot.__slotLabel = isMulti ? `Bot ${slot}` : "Bot";
+  bot.isConnected = false;
+  bots.push(bot);
+
+  bot.loadPlugin(pathfinder);
+
+  clearBotTimeouts();
+  connectionTimeoutId = setTimeout(() => {
+    if (!botState.connected) {
+      addLog("[Bot] Connection timeout - no spawn received");
+      try {
+        bot.removeAllListeners();
+        bot.end();
+      } catch (e) {
+        /* ignore */
+      }
+      stopAllBots();
+      scheduleReconnect();
+    }
+  }, 150000);
+
+  let spawnHandled = false;
+
+  bot.once("spawn", () => {
+    if (spawnHandled) return;
+    spawnHandled = true;
+
+    clearBotTimeouts();
+    bot.isConnected = true;
+    updateGlobalConnectionState();
+    botState.lastActivity = Date.now();
+    botState.reconnectAttempts = 0;
+    isReconnecting = false;
+
+    addLog(
+      `[${bot.__slotLabel}] [+] Successfully spawned on server! (Version: ${bot.version})`,
+    );
+    if (
+      config.discord &&
+      config.discord.events &&
+      config.discord.events.connect
+    ) {
+      sendDiscordWebhook(
+        `[+] **Connected** to \`${config.server.ip}\``,
+        0x4ade80,
+      );
+    }
+
+    const mcData = require("minecraft-data")(bot.version);
+    const defaultMove = new Movements(bot, mcData);
+    defaultMove.allowFreeMotion = false;
+    defaultMove.canDig = false;
+    defaultMove.liquidCost = 1000;
+    defaultMove.fallDamageCost = 1000;
+
+    initializeModules(bot, mcData, defaultMove);
+
+    setTimeout(() => {
+      if (bot && bot.isConnected && config.server["try-creative"]) {
+        bot.chat("/gamemode creative");
+        addLog("[INFO] Attempted to set creative mode (requires OP)");
+      }
+    }, 3000);
+
+    bot.on("messagestr", (message) => {
+      if (
+        message.includes("commands.gamemode.success.self") ||
+        message.includes("Set own game mode to Creative Mode")
+      ) {
+        addLog(`[${bot.__slotLabel}] [INFO] Bot is now in Creative Mode.`);
+      }
+    });
+  });
+
+  bot.on("kicked", (reason) => {
+    const kickReason =
+      typeof reason === "object" ? JSON.stringify(reason) : reason;
+    addLog(`[${bot.__slotLabel}] Kicked: ${kickReason}`);
+    bot.isConnected = false;
+    updateGlobalConnectionState();
+    botState.errors.push({
+      type: "kicked",
+      reason: kickReason,
+      time: Date.now(),
+    });
+
+    const reasonStr = String(kickReason).toLowerCase();
+    if (
+      reasonStr.includes("throttl") ||
+      reasonStr.includes("wait before reconnect") ||
+      reasonStr.includes("too fast")
+    ) {
+      addLog(
+        "[Bot] Throttle kick detected - will use extended reconnect delay",
+      );
+      botState.wasThrottled = true;
+    }
+
+    if (
+      config.discord &&
+      config.discord.events &&
+      config.discord.events.disconnect
+    ) {
+      sendDiscordWebhook(`[!] **Kicked**: ${kickReason}`, 0xff0000);
+    }
+  });
+
+  bot.on("end", (reason) => {
+    addLog(`[${bot.__slotLabel}] Disconnected: ${reason || "Unknown reason"}`);
+    bot.isConnected = false;
+    updateGlobalConnectionState();
+    spawnHandled = false;
+
+    if (
+      config.discord &&
+      config.discord.events &&
+      config.discord.events.disconnect
+    ) {
+      sendDiscordWebhook(
+        `[-] **Disconnected**: ${reason || "Unknown"}`,
+        0xf87171,
+      );
+    }
+
+    if (getConnectedBotCount() === 0) {
+      clearAllIntervals();
+      scheduleReconnect();
+    }
+  });
+
+  bot.on("error", (err) => {
+    const msg = err.message || "";
+    addLog(`[${bot.__slotLabel}] Error: ${msg}`);
+    botState.errors.push({ type: "error", message: msg, time: Date.now() });
+  });
 }
 
 function scheduleReconnect() {
   clearBotTimeouts();
 
-  // FIX: don't stack reconnect if already waiting
-  if (isReconnecting) {
-    addLog("[Bot] Reconnect already scheduled, skipping duplicate.");
+  if (isReconnecting || getConnectedBotCount() > 0) {
+    addLog(
+      "[Bot] Reconnect skipped because a bot is already connected or reconnect is already scheduled.",
+    );
     return;
   }
 
@@ -1415,7 +1674,7 @@ function initializeModules(bot, mcData, defaultMove) {
     let authHandled = false;
 
     const tryAuth = (type) => {
-      if (authHandled || !bot || !botState.connected) return;
+      if (authHandled || !bot || !bot.isConnected) return;
       authHandled = true;
       if (type === "register") {
         bot.chat(`/register ${password} ${password}`);
@@ -1446,7 +1705,7 @@ function initializeModules(bot, mcData, defaultMove) {
 
     // Failsafe: if no prompt after 10s, try login anyway
     setTimeout(() => {
-      if (!authHandled && bot && botState.connected) {
+      if (!authHandled && bot && bot.isConnected) {
         addLog(
           "[Auth] No prompt detected after 10s, sending /login as failsafe",
         );
@@ -1462,19 +1721,19 @@ function initializeModules(bot, mcData, defaultMove) {
     if (config.utils["chat-messages"].repeat) {
       let i = 0;
       addInterval(() => {
-        if (bot && botState.connected) {
-          bot.chat(messages[i]);
-          botState.lastActivity = Date.now();
-          i = (i + 1) % messages.length;
-        }
-      }, config.utils["chat-messages"]["repeat-delay"] * 1000);
-    } else {
-      messages.forEach((msg, idx) => {
-        setTimeout(() => {
-          if (bot && botState.connected) bot.chat(msg);
-        }, idx * 1000);
-      });
-    }
+          if (bot && bot.isConnected) {
+            bot.chat(messages[i]);
+            botState.lastActivity = Date.now();
+            i = (i + 1) % messages.length;
+          }
+        }, config.utils["chat-messages"]["repeat-delay"] * 1000);
+      } else {
+        messages.forEach((msg, idx) => {
+          setTimeout(() => {
+            if (bot && bot.isConnected) bot.chat(msg);
+          }, idx * ((config.utils["chat-messages"]["repeat-delay"] || 5) * 1000));
+        });
+      }
   }
 
   // ---------- MOVE TO POSITION ----------
@@ -1500,7 +1759,7 @@ function initializeModules(bot, mcData, defaultMove) {
     // Arm swinging
     addInterval(
       () => {
-        if (!bot || !botState.connected) return;
+        if (!bot || !bot.isConnected) return;
         try {
           bot.swingArm();
         } catch (e) {}
@@ -1511,7 +1770,7 @@ function initializeModules(bot, mcData, defaultMove) {
     // Hotbar cycling
     addInterval(
       () => {
-        if (!bot || !botState.connected) return;
+        if (!bot || !bot.isConnected) return;
         try {
           const slot = Math.floor(Math.random() * 9);
           bot.setQuickBarSlot(slot);
@@ -1525,7 +1784,7 @@ function initializeModules(bot, mcData, defaultMove) {
       () => {
         if (
           !bot ||
-          !botState.connected ||
+          !bot.isConnected ||
           typeof bot.setControlState !== "function"
         )
           return;
@@ -1562,7 +1821,7 @@ function initializeModules(bot, mcData, defaultMove) {
         () => {
           if (
             !bot ||
-            !botState.connected ||
+            !bot.isConnected ||
             typeof bot.setControlState !== "function"
           )
             return;
@@ -1650,7 +1909,7 @@ function startCircleWalk(bot, defaultMove) {
   let lastPathTime = 0;
 
   addInterval(() => {
-    if (!bot || !botState.connected) return;
+    if (!bot || !bot.isConnected) return;
     const now = Date.now();
     if (now - lastPathTime < 2000) return;
     lastPathTime = now;
@@ -1677,7 +1936,7 @@ function startRandomJump(bot) {
   addInterval(() => {
     if (
       !bot ||
-      !botState.connected ||
+      !bot.isConnected ||
       typeof bot.setControlState !== "function"
     )
       return;
@@ -1696,7 +1955,7 @@ function startRandomJump(bot) {
 
 function startLookAround(bot) {
   addInterval(() => {
-    if (!bot || !botState.connected) return;
+    if (!bot || !bot.isConnected) return;
     try {
       const yaw = Math.random() * Math.PI * 2 - Math.PI;
       const pitch = (Math.random() * Math.PI) / 2 - Math.PI / 4;
@@ -1719,7 +1978,7 @@ function avoidMobs(bot) {
   addInterval(() => {
     if (
       !bot ||
-      !botState.connected ||
+      !bot.isConnected ||
       typeof bot.setControlState !== "function"
     )
       return;
@@ -1758,7 +2017,7 @@ function combatModule(bot, mcData) {
 
   // FIX: use physicsTick (not the deprecated physicTick)
   bot.on("physicsTick", () => {
-    if (!bot || !botState.connected) return;
+    if (!bot || !bot.isConnected) return;
     if (!config.combat["attack-mobs"]) return;
 
     const now = Date.now();
@@ -1829,7 +2088,7 @@ function bedModule(bot, mcData) {
   let isTryingToSleep = false;
 
   addInterval(async () => {
-    if (!bot || !botState.connected) return;
+    if (!bot || !bot.isConnected) return;
     if (!config.beds["place-night"]) return; // FIX: check flag (was always skipping before)
 
     try {
@@ -1906,7 +2165,7 @@ const rl = readline.createInterface({
 });
 
 rl.on("line", (line) => {
-  if (!bot || !botState.connected) {
+  if (getConnectedBotCount() === 0) {
     addLog("[Console] Bot not connected");
     return;
   }
@@ -1918,7 +2177,7 @@ rl.on("line", (line) => {
     bot.chat("/" + trimmed.slice(4));
   } else if (trimmed === "status") {
     addLog(
-      `Connected: ${botState.connected}, Uptime: ${formatUptime(Math.floor((Date.now() - botState.startTime) / 1000))}`,
+      `Connected: ${getConnectedBotCount()}/${getTotalBotCount()}, Uptime: ${formatUptime(Math.floor((Date.now() - botState.startTime) / 1000))}`,
     );
   } else {
     bot.chat(trimmed);
