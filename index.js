@@ -28,8 +28,6 @@ let botState = {
 
 // Health check endpoint for monitoring
 app.get('/', (req, res) => {
-
-app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
