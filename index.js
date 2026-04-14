@@ -28,366 +28,417 @@ let botState = {
 
 // Health check endpoint for monitoring
 app.get('/', (req, res) => {
+
+app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
       <head>
-        <title>${config.name} Dashboard</title>
+        <title>${config.name} — Command Center</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="print" onload="this.media='all'"
-              href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
+
           :root {
-            --bg-deep: #07090f;
-            --bg-surface: #0e1218;
-            --bg-card: #141920;
-            --bg-card-hover: #1a2029;
-            --bg-elevated: #1c2330;
-            --border-subtle: rgba(255,255,255,0.06);
-            --border-accent: rgba(255,255,255,0.1);
-            --text-primary: #f1f5f9;
+            --bg-deep: #06080d;
+            --bg-surface: #0c1017;
+            --bg-card: #111721;
+            --bg-card-hover: #171e2b;
+            --bg-elevated: #1a2235;
+            --bg-glass: rgba(17,23,33,0.7);
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-accent: rgba(255,255,255,0.08);
+            --border-glow: rgba(99,102,241,0.3);
+            --text-primary: #eef2ff;
             --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --green: #22c55e;
-            --green-dim: #16a34a;
-            --green-glow: rgba(34,197,94,0.15);
-            --green-bg: rgba(34,197,94,0.08);
-            --red: #ef4444;
-            --red-dim: #dc2626;
-            --red-glow: rgba(239,68,68,0.15);
-            --red-bg: rgba(239,68,68,0.08);
-            --blue: #3b82f6;
-            --blue-glow: rgba(59,130,246,0.15);
-            --yellow: #eab308;
-            --radius: 14px;
+            --text-muted: #475569;
+            --accent: #818cf8;
+            --accent-dim: #6366f1;
+            --accent-glow: rgba(129,140,248,0.12);
+            --accent-bg: rgba(129,140,248,0.06);
+            --green: #34d399;
+            --green-dim: #10b981;
+            --green-glow: rgba(52,211,153,0.12);
+            --green-bg: rgba(52,211,153,0.06);
+            --red: #f87171;
+            --red-dim: #ef4444;
+            --red-glow: rgba(248,113,113,0.12);
+            --red-bg: rgba(248,113,113,0.06);
+            --amber: #fbbf24;
+            --amber-bg: rgba(251,191,36,0.06);
+            --blue: #60a5fa;
+            --blue-bg: rgba(96,165,250,0.06);
+            --radius: 16px;
             --radius-sm: 10px;
-            --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
-            --shadow-glow-green: 0 0 20px rgba(34,197,94,0.12);
-            --shadow-glow-red: 0 0 20px rgba(239,68,68,0.12);
+            --radius-xs: 6px;
+            --shadow-card: 0 4px 32px rgba(0,0,0,0.4);
+            --shadow-float: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
           }
-
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-deep);
             color: var(--text-primary);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
           }
+          @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+          @keyframes pulse-ring { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.8); opacity:0; } }
+          @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+          @keyframes gradient-shift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+          @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+          @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
-          @keyframes pulse-glow {
-            0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; }
-            50% { opacity: 0.4; box-shadow: 0 0 2px currentColor; }
-          }
-          @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-          }
+          body { padding: 0; }
 
-          body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-          }
+          .app-shell { display: flex; min-height: 100vh; }
 
-          main {
-            width: 100%;
-            max-width: 420px;
+          /* ——— Sidebar ——— */
+          .sidebar {
+            width: 260px; flex-shrink: 0;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex; flex-direction: column;
+            padding: 28px 0;
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+          }
+          .sidebar-brand {
+            padding: 0 24px; margin-bottom: 36px;
+            display: flex; align-items: center; gap: 12px;
+          }
+          .brand-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--green));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 900; color: #fff;
+            box-shadow: 0 0 20px var(--accent-glow);
+          }
+          .brand-name { font-size: 17px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; }
+          .brand-tag { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+          .nav-section { padding: 0 14px; margin-bottom: 8px; }
+          .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); padding: 0 10px; margin-bottom: 8px; }
+          .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: var(--radius-sm);
+            font-size: 13.5px; font-weight: 500; color: var(--text-secondary);
+            text-decoration: none; transition: all 0.2s;
+            margin-bottom: 2px;
+          }
+          .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+          .nav-item.active {
+            background: var(--accent-bg); color: var(--accent);
+            font-weight: 600; border: 1px solid rgba(129,140,248,0.12);
+          }
+          .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+          .sidebar-footer { margin-top: auto; padding: 0 24px; }
+          .sidebar-status {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm); padding: 14px; font-size: 12px;
+          }
+          .sidebar-status-label { color: var(--text-muted); margin-bottom: 6px; }
+          .sidebar-status-value { color: var(--text-primary); font-weight: 600; font-family: var(--font-mono); font-size: 11px; }
+
+          /* ——— Main ——— */
+          .main-content { flex: 1; margin-left: 260px; padding: 32px 40px; }
+
+          .page-header { margin-bottom: 32px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+          .page-title { font-size: 28px; font-weight: 900; letter-spacing: -0.7px; color: var(--text-primary); }
+          .page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+          .header-actions { display: flex; gap: 10px; }
+
+          /* ——— Status Banner ——— */
+          .status-banner {
+            border-radius: var(--radius); padding: 24px 28px;
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 28px; transition: all 0.5s ease;
+            position: relative; overflow: hidden;
             animation: fadeInUp 0.5s ease-out;
           }
-
-          header { margin-bottom: 32px; }
-          header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
-            line-height: 1.15;
+          .status-banner::before {
+            content: ''; position: absolute; inset: 0; opacity: 0.4;
+            background: linear-gradient(135deg, transparent 40%, currentColor);
+            pointer-events: none;
           }
-          header p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            letter-spacing: 0.2px;
-          }
-
-          .status-section {
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-          }
-          .status-section.online {
-            background: var(--green-bg);
-            border: 1.5px solid rgba(34,197,94,0.25);
-            box-shadow: var(--shadow-glow-green);
-          }
-          .status-section.offline {
-            background: var(--red-bg);
-            border: 1.5px solid rgba(239,68,68,0.25);
-            box-shadow: var(--shadow-glow-red);
-          }
-
-          .status-icon {
-            width: 48px; height: 48px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; flex-shrink: 0;
-            transition: all 0.4s ease;
-            position: relative;
-          }
-          .status-icon.online {
-            background: rgba(34,197,94,0.2);
+          .status-banner.online {
+            background: var(--green-bg); border: 1px solid rgba(52,211,153,0.15);
             color: var(--green);
-            box-shadow: 0 0 16px rgba(34,197,94,0.2);
           }
-          .status-icon.offline {
-            background: rgba(239,68,68,0.2);
+          .status-banner.offline {
+            background: var(--red-bg); border: 1px solid rgba(248,113,113,0.15);
             color: var(--red);
-            box-shadow: 0 0 16px rgba(239,68,68,0.2);
           }
-          .status-icon::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 50%;
-            border: 2px solid currentColor;
-            opacity: 0.3;
-            animation: pulse-glow 2s ease-in-out infinite;
+          .status-indicator { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+          .status-dot {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800; position: relative; z-index: 2;
           }
+          .status-dot.online { background: rgba(52,211,153,0.15); color: var(--green); }
+          .status-dot.offline { background: rgba(248,113,113,0.15); color: var(--red); }
+          .status-ring {
+            position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid currentColor; opacity: 0.3;
+            animation: pulse-ring 2s ease-out infinite;
+          }
+          .status-info h2 { font-size: 20px; font-weight: 800; line-height: 1.2; }
+          .status-info p { font-size: 13px; opacity: 0.7; margin-top: 2px; }
 
-          .status-label {
-            font-size: 18px; font-weight: 700; line-height: 1.2;
-            transition: color 0.3s;
-          }
-          .status-label.online { color: var(--green); }
-          .status-label.offline { color: var(--red); }
-          .status-detail { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
-
-          dl { margin: 0; }
-          .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm);
-            padding: 18px 22px;
-            margin-bottom: 10px;
-            transition: all 0.25s ease;
+          /* ——— Stats Grid ——— */
+          .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+          .stat-tile {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius); padding: 22px 24px;
+            transition: all 0.3s ease;
             animation: fadeInUp 0.5s ease-out backwards;
           }
-          .stat-card:nth-child(1) { animation-delay: 0.1s; }
-          .stat-card:nth-child(2) { animation-delay: 0.18s; }
-          .stat-card:nth-child(3) { animation-delay: 0.26s; }
-          .stat-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-accent);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-card);
+          .stat-tile:nth-child(1) { animation-delay: 0.08s; }
+          .stat-tile:nth-child(2) { animation-delay: 0.14s; }
+          .stat-tile:nth-child(3) { animation-delay: 0.20s; }
+          .stat-tile:nth-child(4) { animation-delay: 0.26s; }
+          .stat-tile:hover {
+            background: var(--bg-card-hover); border-color: var(--border-accent);
+            transform: translateY(-2px); box-shadow: var(--shadow-card);
           }
-          dt {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
+          .stat-icon { font-size: 20px; margin-bottom: 14px; }
+          .stat-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 8px;
           }
-          dd { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
-          .stat-detail { margin: 6px 0 0; font-size: 11px; color: var(--text-muted); opacity: 0.7; }
+          .stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; }
+          .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
 
-          .controls { margin-top: 12px; }
-          .btn-grid { display: grid; gap: 10px; margin-bottom: 10px; }
-          .btn-grid-2 { grid-template-columns: 1fr 1fr; }
+          /* ——— Module Cards ——— */
+          .section-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+          .section-badge { font-size: 11px; background: var(--accent-bg); color: var(--accent); padding: 3px 10px; border-radius: 20px; font-weight: 600; }
 
-          .btn-primary {
-            min-height: 52px; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 700;
-            cursor: pointer; letter-spacing: 0.3px;
-            font-family: inherit;
-            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-            position: relative;
-            overflow: hidden;
+          .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+          .module-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm); padding: 16px 18px;
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s;
           }
-          .btn-primary::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
-            opacity: 0;
-            transition: opacity 0.25s;
-          }
-          .btn-primary:hover::before { opacity: 1; }
-          .btn-primary:hover { transform: translateY(-1px); }
-          .btn-primary:active { transform: scale(0.98); }
-          .btn-start {
-            border: 1.5px solid rgba(34,197,94,0.35);
-            background: var(--green-bg);
-            color: var(--green);
-          }
-          .btn-start:hover { box-shadow: 0 4px 20px rgba(34,197,94,0.2); }
-          .btn-stop {
-            border: 1.5px solid rgba(239,68,68,0.35);
-            background: var(--red-bg);
-            color: var(--red);
-          }
-          .btn-stop:hover { box-shadow: 0 4px 20px rgba(239,68,68,0.2); }
+          .module-card:hover { border-color: var(--border-accent); }
+          .module-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+          .module-dot.on { background: var(--green); box-shadow: 0 0 8px var(--green-glow); animation: pulse-dot 2s infinite; }
+          .module-dot.off { background: var(--text-muted); }
+          .module-name { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+          .module-status { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-          .btn-secondary {
-            min-height: 44px; border-radius: var(--radius-sm);
-            border: 1px solid var(--border-subtle);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            font-size: 13px; font-weight: 500;
-            text-decoration: none;
-            display: flex; align-items: center; justify-content: center;
-            font-family: inherit; cursor: pointer;
+          /* ——— Controls ——— */
+          .controls-row { display: flex; gap: 12px; flex-wrap: wrap; }
+          .btn {
+            height: 48px; border-radius: var(--radius-sm);
+            font-size: 13.5px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            border: 1.5px solid transparent;
             transition: all 0.25s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 0 24px; position: relative; overflow: hidden;
           }
-          .btn-secondary:hover {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            border-color: var(--border-accent);
-            transform: translateY(-1px);
+          .btn::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent);
+            opacity: 0; transition: opacity 0.25s;
           }
+          .btn:hover::after { opacity: 1; }
+          .btn:hover { transform: translateY(-1px); }
+          .btn:active { transform: scale(0.97); }
+          .btn-start { border-color: rgba(52,211,153,0.3); background: var(--green-bg); color: var(--green); }
+          .btn-start:hover { box-shadow: 0 4px 24px var(--green-glow); }
+          .btn-stop { border-color: rgba(248,113,113,0.3); background: var(--red-bg); color: var(--red); }
+          .btn-stop:hover { box-shadow: 0 4px 24px var(--red-glow); }
+          .btn-ghost {
+            border-color: var(--border-subtle); background: var(--bg-card);
+            color: var(--text-secondary); text-decoration: none;
+          }
+          .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-accent); }
 
-          footer { margin-top: 24px; text-align: center; }
-          footer p { font-size: 11px; color: var(--text-muted); opacity: 0.5; }
-</style>
+          /* ——— Responsive ——— */
+          @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .modules-grid { grid-template-columns: 1fr 1fr; }
+          }
+        </style>
       </head>
       <body>
-        <main role="main" aria-label="AFK Bot Dashboard">
+        <div class="app-shell">
 
-          <header>
-            <h1>AFK Bot Dashboard</h1>
-            <p>Minecraft server bot &middot; Live status</p>
-          </header>
-
-          <section
-            id="status-section"
-            role="status"
-            aria-live="polite"
-            aria-label="Bot connection status"
-            class="status-section offline"
-          >
-            <div id="status-icon" aria-hidden="true" class="status-icon offline">&#x2717;</div>
-            <div>
-              <div id="status-label" class="status-label offline">Connecting…</div>
-              <div id="status-detail" class="status-detail">Establishing connection</div>
-            </div>
-          </section>
-
-          <section aria-label="Bot statistics">
-            <dl>
-              <div class="stat-card">
-                <dt>Uptime</dt>
-                <dd id="uptime-text">—</dd>
-                <p class="stat-detail">Time since last connection</p>
+          <nav class="sidebar">
+            <div class="sidebar-brand">
+              <div class="brand-icon">F</div>
+              <div>
+                <div class="brand-name">FluxAFK</div>
+                <div class="brand-tag">Command Center</div>
               </div>
-              <div class="stat-card">
-                <dt>Coordinates</dt>
-                <dd id="coords-text">Searching…</dd>
-                <p class="stat-detail">Bot's current in-game position</p>
-              </div>
-              <div class="stat-card">
-                <dt>Server address</dt>
-                <dd>${config.server.ip}</dd>
-                <p class="stat-detail">Minecraft server hostname</p>
-              </div>
-            </dl>
-          </section>
-
-          <section class="controls" aria-label="Bot controls">
-            <div class="btn-grid btn-grid-2">
-              <button class="btn-primary btn-start" onclick="startBot()" aria-label="Start bot">Start bot</button>
-              <button class="btn-primary btn-stop" onclick="stopBot()" aria-label="Stop bot">Stop bot</button>
             </div>
-            <div class="btn-grid btn-grid-2">
-              <a href="/tutorial" class="btn-secondary" aria-label="View setup guide">Setup guide</a>
-              <a href="/logs" class="btn-secondary" aria-label="View bot logs">View logs</a>
+
+            <div class="nav-section">
+              <div class="nav-label">Navigation</div>
+              <a href="/" class="nav-item active"><span class="nav-icon">◈</span> Dashboard</a>
+              <a href="/logs" class="nav-item"><span class="nav-icon">▤</span> Live Logs</a>
+              <a href="/tutorial" class="nav-item"><span class="nav-icon">◎</span> Setup Guide</a>
             </div>
-          </section>
 
-          <footer>
-            <p>Status updates every 5 seconds</p>
-          </footer>
+            <div class="sidebar-footer">
+              <div class="sidebar-status">
+                <div class="sidebar-status-label">Server</div>
+                <div class="sidebar-status-value">${config.server.ip}:${config.server.port}</div>
+              </div>
+            </div>
+          </nav>
 
-        </main>
+          <main class="main-content" role="main">
+
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Real-time bot monitoring &amp; control</p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-start" onclick="startBot()">▶ Start</button>
+                <button class="btn btn-stop" onclick="stopBot()">■ Stop</button>
+              </div>
+            </div>
+
+            <section id="status-banner" class="status-banner offline" role="status" aria-live="polite">
+              <div class="status-indicator">
+                <div id="status-dot" class="status-dot offline">✗</div>
+                <div class="status-ring"></div>
+              </div>
+              <div class="status-info">
+                <h2 id="status-label">Connecting…</h2>
+                <p id="status-detail">Establishing connection to server</p>
+              </div>
+            </section>
+
+            <div class="stats-grid">
+              <div class="stat-tile">
+                <div class="stat-icon">⏱</div>
+                <div class="stat-label">Uptime</div>
+                <div class="stat-value" id="uptime-text">—</div>
+                <div class="stat-sub">Since last connection</div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon">📍</div>
+                <div class="stat-label">Position</div>
+                <div class="stat-value" id="coords-text">Searching…</div>
+                <div class="stat-sub">Current coordinates</div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-label">Reconnects</div>
+                <div class="stat-value" id="reconnect-text">0</div>
+                <div class="stat-sub">Since startup</div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon">💾</div>
+                <div class="stat-label">Memory</div>
+                <div class="stat-value" id="memory-text">—</div>
+                <div class="stat-sub">Heap usage</div>
+              </div>
+            </div>
+
+            <div class="section-title">Active Modules <span class="section-badge">${Object.values(config.modules).filter(Boolean).length} enabled</span></div>
+            <div class="modules-grid">
+              <div class="module-card">
+                <div class="module-dot ${config.modules.avoidMobs ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Mob Avoidance</div><div class="module-status">${config.modules.avoidMobs ? 'Active' : 'Off'}</div></div>
+              </div>
+              <div class="module-card">
+                <div class="module-dot ${config.modules.combat ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Combat</div><div class="module-status">${config.modules.combat ? 'Active' : 'Off'}</div></div>
+              </div>
+              <div class="module-card">
+                <div class="module-dot ${config.modules.chat ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Chat Response</div><div class="module-status">${config.modules.chat ? 'Active' : 'Off'}</div></div>
+              </div>
+              <div class="module-card">
+                <div class="module-dot ${config.modules.beds ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Bed Module</div><div class="module-status">${config.modules.beds ? 'Active' : 'Off'}</div></div>
+              </div>
+              <div class="module-card">
+                <div class="module-dot ${config.movement.enabled ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Movement</div><div class="module-status">${config.movement.enabled ? 'Active' : 'Off'}</div></div>
+              </div>
+              <div class="module-card">
+                <div class="module-dot ${config.utils['anti-afk'].enabled ? 'on' : 'off'}"></div>
+                <div><div class="module-name">Anti-AFK</div><div class="module-status">${config.utils['anti-afk'].enabled ? 'Active' : 'Off'}</div></div>
+              </div>
+            </div>
+
+            <div class="section-title">Quick Links</div>
+            <div class="controls-row">
+              <a href="/logs" class="btn btn-ghost">▤ Live Logs</a>
+              <a href="/tutorial" class="btn btn-ghost">◎ Setup Guide</a>
+            </div>
+
+          </main>
+        </div>
 
         <script>
           function formatUptime(s) {
-            const h = Math.floor(s / 3600);
-            const m = Math.floor((s % 3600) / 60);
-            const sec = s % 60;
+            var h = Math.floor(s / 3600);
+            var m = Math.floor((s % 3600) / 60);
+            var sec = s % 60;
             if (h > 0) return h + 'h ' + m + 'm ' + sec + 's';
             if (m > 0) return m + 'm ' + sec + 's';
-            return sec + ' seconds';
+            return sec + 's';
           }
 
           async function update() {
             try {
-              const r = await fetch('/health');
-              const data = await r.json();
-              const online = data.status === 'connected';
+              var r = await fetch('/health');
+              var data = await r.json();
+              var online = data.status === 'connected';
 
-              const section = document.getElementById('status-section');
-              const icon    = document.getElementById('status-icon');
-              const label   = document.getElementById('status-label');
-              const detail  = document.getElementById('status-detail');
+              var banner = document.getElementById('status-banner');
+              var dot    = document.getElementById('status-dot');
+              var label  = document.getElementById('status-label');
+              var detail = document.getElementById('status-detail');
 
-              section.className = 'status-section ' + (online ? 'online' : 'offline');
-              icon.className    = 'status-icon '    + (online ? 'online' : 'offline');
-              icon.textContent  = online ? '✓' : '✗';
-              label.className   = 'status-label '   + (online ? 'online' : 'offline');
+              banner.className = 'status-banner ' + (online ? 'online' : 'offline');
+              dot.className    = 'status-dot '    + (online ? 'online' : 'offline');
+              dot.textContent  = online ? '✓' : '✗';
               label.textContent = online ? 'Connected' : 'Disconnected';
-              detail.textContent = online ? 'Bot is active on the server' : 'Attempting to reconnect';
+              detail.textContent = online ? 'Bot is active on the server' : 'Attempting to reconnect…';
 
               document.getElementById('uptime-text').textContent = formatUptime(data.uptime);
+              document.getElementById('reconnect-text').textContent = data.reconnectAttempts || '0';
+              document.getElementById('memory-text').textContent = (data.memoryUsage || 0).toFixed(1) + ' MB';
 
               if (data.coords) {
-                const x = Math.floor(data.coords.x);
-                const y = Math.floor(data.coords.y);
-                const z = Math.floor(data.coords.z);
-                document.getElementById('coords-text').textContent = 'X ' + x + ', Y ' + y + ', Z ' + z;
+                var x = Math.floor(data.coords.x);
+                var y = Math.floor(data.coords.y);
+                var z = Math.floor(data.coords.z);
+                document.getElementById('coords-text').textContent = x + ', ' + y + ', ' + z;
               } else {
                 document.getElementById('coords-text').textContent = 'Searching…';
               }
             } catch (e) {
-              const label = document.getElementById('status-label');
-              label.className = 'status-label offline';
-              label.textContent = 'Unreachable';
+              document.getElementById('status-label').textContent = 'Unreachable';
             }
           }
 
           async function startBot() {
-            const r = await fetch('/start', { method: 'POST' });
-            const data = await r.json();
+            var r = await fetch('/start', { method: 'POST' });
+            var data = await r.json();
             alert(data.success ? 'Bot started!' : data.msg);
             update();
           }
 
           async function stopBot() {
-            const r = await fetch('/stop', { method: 'POST' });
-            const data = await r.json();
+            var r = await fetch('/stop', { method: 'POST' });
+            var data = await r.json();
             alert(data.success ? 'Bot stopped!' : data.msg);
             update();
           }
@@ -399,188 +450,189 @@ app.get('/', (req, res) => {
     </html>
   `);
 });
+
+
 app.get("/tutorial", (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
       <head>
-        <title>${config.name} - Setup Guide</title>
+        <title>${config.name} — Setup Guide</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="print" onload="this.media='all'"
-              href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
+
           :root {
-            --bg-deep: #07090f;
-            --bg-surface: #0e1218;
-            --bg-card: #141920;
-            --bg-card-hover: #1a2029;
-            --bg-elevated: #1c2330;
-            --border-subtle: rgba(255,255,255,0.06);
-            --border-accent: rgba(255,255,255,0.1);
-            --text-primary: #f1f5f9;
+            --bg-deep: #06080d;
+            --bg-surface: #0c1017;
+            --bg-card: #111721;
+            --bg-card-hover: #171e2b;
+            --bg-elevated: #1a2235;
+            --bg-glass: rgba(17,23,33,0.7);
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-accent: rgba(255,255,255,0.08);
+            --border-glow: rgba(99,102,241,0.3);
+            --text-primary: #eef2ff;
             --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --green: #22c55e;
-            --green-dim: #16a34a;
-            --green-glow: rgba(34,197,94,0.15);
-            --green-bg: rgba(34,197,94,0.08);
-            --red: #ef4444;
-            --red-dim: #dc2626;
-            --red-glow: rgba(239,68,68,0.15);
-            --red-bg: rgba(239,68,68,0.08);
-            --blue: #3b82f6;
-            --blue-glow: rgba(59,130,246,0.15);
-            --yellow: #eab308;
-            --radius: 14px;
+            --text-muted: #475569;
+            --accent: #818cf8;
+            --accent-dim: #6366f1;
+            --accent-glow: rgba(129,140,248,0.12);
+            --accent-bg: rgba(129,140,248,0.06);
+            --green: #34d399;
+            --green-dim: #10b981;
+            --green-glow: rgba(52,211,153,0.12);
+            --green-bg: rgba(52,211,153,0.06);
+            --red: #f87171;
+            --red-dim: #ef4444;
+            --red-glow: rgba(248,113,113,0.12);
+            --red-bg: rgba(248,113,113,0.06);
+            --amber: #fbbf24;
+            --amber-bg: rgba(251,191,36,0.06);
+            --blue: #60a5fa;
+            --blue-bg: rgba(96,165,250,0.06);
+            --radius: 16px;
             --radius-sm: 10px;
-            --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
-            --shadow-glow-green: 0 0 20px rgba(34,197,94,0.12);
-            --shadow-glow-red: 0 0 20px rgba(239,68,68,0.12);
+            --radius-xs: 6px;
+            --shadow-card: 0 4px 32px rgba(0,0,0,0.4);
+            --shadow-float: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
           }
-
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-deep);
             color: var(--text-primary);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
           }
-
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
-          @keyframes pulse-glow {
-            0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; }
-            50% { opacity: 0.4; box-shadow: 0 0 2px currentColor; }
-          }
-          @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-          }
+          @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+          @keyframes pulse-ring { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.8); opacity:0; } }
+          @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+          @keyframes gradient-shift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+          @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+          @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 
           body { padding: 40px 24px; }
+          main { width: 100%; max-width: 640px; margin: 0 auto; animation: fadeInUp 0.5s ease-out; }
 
-          main {
-            width: 100%; max-width: 560px; margin: 0 auto;
-            animation: fadeInUp 0.5s ease-out;
-          }
-
-          .back-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 13px; font-weight: 500; color: var(--text-secondary);
-            text-decoration: none;
+          .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            text-decoration: none; padding: 10px 18px;
             background: var(--bg-card); border: 1px solid var(--border-subtle);
-            border-radius: 8px; padding: 8px 16px; margin-bottom: 32px;
-            transition: all 0.25s ease;
+            border-radius: var(--radius-sm); margin-bottom: 36px;
+            transition: all 0.25s;
           }
-          .back-btn:hover { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-accent); transform: translateX(-2px); }
+          .back-link:hover { background: var(--bg-elevated); color: var(--text-primary); transform: translateX(-3px); }
 
-          header { margin-bottom: 36px; }
-          header h1 { font-size: 28px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
-          header p { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+          header { margin-bottom: 40px; }
+          header h1 { font-size: 32px; font-weight: 900; letter-spacing: -0.7px; }
+          header p { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
+          .timeline { position: relative; padding-left: 36px; }
+          .timeline::before {
+            content: ''; position: absolute; left: 15px; top: 4px; bottom: 4px;
+            width: 2px; background: linear-gradient(to bottom, var(--accent), var(--green), var(--blue));
+            border-radius: 2px; opacity: 0.3;
+          }
+          .timeline-step {
+            position: relative; margin-bottom: 32px;
+            animation: fadeInUp 0.5s ease-out backwards;
+          }
+          .timeline-step:nth-child(1) { animation-delay: 0.1s; }
+          .timeline-step:nth-child(2) { animation-delay: 0.2s; }
+          .timeline-step:nth-child(3) { animation-delay: 0.3s; }
+
+          .timeline-dot {
+            position: absolute; left: -36px; top: 4px;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800; z-index: 2;
+          }
+          .timeline-step:nth-child(1) .timeline-dot { background: var(--accent-bg); color: var(--accent); border: 2px solid rgba(129,140,248,0.25); }
+          .timeline-step:nth-child(2) .timeline-dot { background: var(--green-bg); color: var(--green); border: 2px solid rgba(52,211,153,0.25); }
+          .timeline-step:nth-child(3) .timeline-dot { background: var(--blue-bg); color: var(--blue); border: 2px solid rgba(96,165,250,0.25); }
 
           .step-card {
             background: var(--bg-card); border: 1px solid var(--border-subtle);
-            border-radius: var(--radius); padding: 26px; margin-bottom: 16px;
-            transition: all 0.25s ease;
-            animation: fadeInUp 0.5s ease-out backwards;
+            border-radius: var(--radius); padding: 28px;
+            transition: all 0.3s;
           }
-          .step-card:nth-child(1) { animation-delay: 0.1s; }
-          .step-card:nth-child(2) { animation-delay: 0.2s; }
-          .step-card:nth-child(3) { animation-delay: 0.3s; }
-          .step-card:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--shadow-card); }
+          .step-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-card); transform: translateY(-2px); }
+          .step-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 18px; letter-spacing: -0.3px; }
 
-          .step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-
-          .step-number {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--green-bg); border: 1.5px solid rgba(34,197,94,0.3);
-            color: var(--green); font-size: 14px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+          .step-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+          .step-list li {
+            font-size: 14px; color: var(--text-secondary); line-height: 1.7;
+            padding-left: 24px; position: relative;
           }
-          .step-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
-
-          ol { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-          li { font-size: 14px; color: var(--text-secondary); line-height: 1.7; padding-left: 22px; position: relative; }
-          li::before { content: '→'; position: absolute; left: 2px; color: var(--green); font-weight: 600; }
-          li strong { color: var(--text-primary); font-weight: 600; }
+          .step-list li::before { content: '→'; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+          .step-list li strong { color: var(--text-primary); font-weight: 600; }
 
           code {
             background: var(--bg-elevated); border: 1px solid var(--border-accent);
-            padding: 3px 8px; border-radius: 6px;
-            font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--green);
+            padding: 3px 8px; border-radius: var(--radius-xs);
+            font-family: var(--font-mono); font-size: 12px; color: var(--accent);
           }
 
-          a { color: var(--blue); text-decoration: none; }
-          a:hover { text-decoration: underline; }
-
-          footer { margin-top: 36px; text-align: center; }
-          footer p { font-size: 11px; color: var(--text-muted); opacity: 0.5; }
-</style>
+          footer { margin-top: 48px; text-align: center; }
+          footer p { font-size: 11px; color: var(--text-muted); opacity: 0.4; }
+        </style>
       </head>
       <body>
         <main>
-          <a href="/" class="back-btn">&#8592; Back to Dashboard</a>
+          <a href="/" class="back-link">← Dashboard</a>
 
           <header>
             <h1>Setup Guide</h1>
             <p>Get your AFK bot running in under 15 minutes</p>
           </header>
 
-          <div class="step-card">
-            <div class="step-header">
-              <div class="step-number">1</div>
-              <h2 class="step-title">Configure Aternos</h2>
+          <div class="timeline">
+            <div class="timeline-step">
+              <div class="timeline-dot">1</div>
+              <div class="step-card">
+                <h2>Configure Aternos</h2>
+                <ol class="step-list">
+                  <li>Go to <strong>Aternos</strong> and open your server.</li>
+                  <li>Install <strong>Paper/Bukkit</strong> as your server software.</li>
+                  <li>Enable <strong>Cracked</strong> mode using the green switch.</li>
+                  <li>Install plugins: <code>ViaVersion</code>, <code>ViaBackwards</code>, <code>ViaRewind</code></li>
+                </ol>
+              </div>
             </div>
-            <ol>
-              <li>Go to <strong>Aternos</strong> and open your server.</li>
-              <li>Install <strong>Paper/Bukkit</strong> as your server software.</li>
-              <li>Enable <strong>Cracked</strong> mode using the green switch.</li>
-              <li>Install these plugins: <code>ViaVersion</code>, <code>ViaBackwards</code>, <code>ViaRewind</code></li>
-            </ol>
+
+            <div class="timeline-step">
+              <div class="timeline-dot">2</div>
+              <div class="step-card">
+                <h2>GitHub Setup</h2>
+                <ol class="step-list">
+                  <li>Download this project as a ZIP and extract it.</li>
+                  <li>Edit <code>settings.json</code> with your server IP and port.</li>
+                  <li>Upload all files to a new <strong>GitHub Repository</strong>.</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-dot">3</div>
+              <div class="step-card">
+                <h2>Deploy on Replit</h2>
+                <ol class="step-list">
+                  <li>Import your GitHub repo into <strong>Replit</strong>.</li>
+                  <li>Set the run command to <code>npm start</code>.</li>
+                  <li>Hit <strong>Run</strong> — the bot connects automatically.</li>
+                  <li>The bot pings itself every 10 minutes to stay alive.</li>
+                </ol>
+              </div>
+            </div>
           </div>
 
-          <div class="step-card">
-            <div class="step-header">
-              <div class="step-number">2</div>
-              <h2 class="step-title">GitHub Setup</h2>
-            </div>
-            <ol>
-              <li>Download this project as a ZIP and extract it.</li>
-              <li>Edit <code>settings.json</code> with your server IP and port.</li>
-              <li>Upload all files to a new <strong>GitHub Repository</strong>.</li>
-            </ol>
-          </div>
-
-          <div class="step-card">
-            <div class="step-header">
-              <div class="step-number">3</div>
-              <h2 class="step-title">Deploy on Replit (Free 24/7)</h2>
-            </div>
-            <ol>
-              <li>Import your GitHub repo into <strong>Replit</strong>.</li>
-              <li>Set the run command to <code>npm start</code>.</li>
-              <li>Hit <strong>Run</strong> — the bot connects automatically.</li>
-              <li>The bot pings itself every 10 minutes to stay alive.</li>
-            </ol>
-          </div>
-
-          <footer>
-            <p>AFK Bot Dashboard &middot; ${config.name}</p>
-          </footer>
+          <footer><p>FluxAFK &middot; ${config.name}</p></footer>
         </main>
       </body>
     </html>
@@ -599,6 +651,7 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/ping", (req, res) => res.send("pong"));
+
 
 app.get("/logs", (req, res) => {
   const logs = getLogs();
@@ -622,184 +675,156 @@ app.get("/logs", (req, res) => {
     <!DOCTYPE html>
     <html lang="en">
       <head>
-        <title>${config.name} - Logs</title>
+        <title>${config.name} — Live Logs</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="print" onload="this.media='all'"
-              href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
+
           :root {
-            --bg-deep: #07090f;
-            --bg-surface: #0e1218;
-            --bg-card: #141920;
-            --bg-card-hover: #1a2029;
-            --bg-elevated: #1c2330;
-            --border-subtle: rgba(255,255,255,0.06);
-            --border-accent: rgba(255,255,255,0.1);
-            --text-primary: #f1f5f9;
+            --bg-deep: #06080d;
+            --bg-surface: #0c1017;
+            --bg-card: #111721;
+            --bg-card-hover: #171e2b;
+            --bg-elevated: #1a2235;
+            --bg-glass: rgba(17,23,33,0.7);
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-accent: rgba(255,255,255,0.08);
+            --border-glow: rgba(99,102,241,0.3);
+            --text-primary: #eef2ff;
             --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --green: #22c55e;
-            --green-dim: #16a34a;
-            --green-glow: rgba(34,197,94,0.15);
-            --green-bg: rgba(34,197,94,0.08);
-            --red: #ef4444;
-            --red-dim: #dc2626;
-            --red-glow: rgba(239,68,68,0.15);
-            --red-bg: rgba(239,68,68,0.08);
-            --blue: #3b82f6;
-            --blue-glow: rgba(59,130,246,0.15);
-            --yellow: #eab308;
-            --radius: 14px;
+            --text-muted: #475569;
+            --accent: #818cf8;
+            --accent-dim: #6366f1;
+            --accent-glow: rgba(129,140,248,0.12);
+            --accent-bg: rgba(129,140,248,0.06);
+            --green: #34d399;
+            --green-dim: #10b981;
+            --green-glow: rgba(52,211,153,0.12);
+            --green-bg: rgba(52,211,153,0.06);
+            --red: #f87171;
+            --red-dim: #ef4444;
+            --red-glow: rgba(248,113,113,0.12);
+            --red-bg: rgba(248,113,113,0.06);
+            --amber: #fbbf24;
+            --amber-bg: rgba(251,191,36,0.06);
+            --blue: #60a5fa;
+            --blue-bg: rgba(96,165,250,0.06);
+            --radius: 16px;
             --radius-sm: 10px;
-            --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
-            --shadow-glow-green: 0 0 20px rgba(34,197,94,0.12);
-            --shadow-glow-red: 0 0 20px rgba(239,68,68,0.12);
+            --radius-xs: 6px;
+            --shadow-card: 0 4px 32px rgba(0,0,0,0.4);
+            --shadow-float: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
           }
-
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-deep);
             color: var(--text-primary);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
           }
+          @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+          @keyframes pulse-ring { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.8); opacity:0; } }
+          @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+          @keyframes gradient-shift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+          @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+          @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
-          @keyframes pulse-glow {
-            0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; }
-            50% { opacity: 0.4; box-shadow: 0 0 2px currentColor; }
-          }
-          @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-          }
+          body { padding: 32px 24px; }
+          main { width: 100%; max-width: 860px; margin: 0 auto; animation: fadeInUp 0.5s ease-out; }
 
-          body { padding: 40px 24px; }
-
-          main {
-            width: 100%; max-width: 780px; margin: 0 auto;
-            animation: fadeInUp 0.5s ease-out;
-          }
-
-          .back-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 13px; font-weight: 500; color: var(--text-secondary);
-            text-decoration: none;
+          .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+          .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            text-decoration: none; padding: 10px 18px;
             background: var(--bg-card); border: 1px solid var(--border-subtle);
-            border-radius: 8px; padding: 8px 16px; margin-bottom: 32px;
-            transition: all 0.25s ease;
+            border-radius: var(--radius-sm);
+            transition: all 0.25s;
           }
-          .back-btn:hover { background: var(--bg-elevated); color: var(--text-primary); transform: translateX(-2px); }
-
-          .page-header {
-            display: flex; align-items: flex-end; justify-content: space-between;
-            margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
-          }
-          .page-header-left h1 { font-size: 28px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
-          .page-header-left p { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+          .back-link:hover { background: var(--bg-elevated); color: var(--text-primary); transform: translateX(-3px); }
 
           .badge {
-            font-size: 12px; font-weight: 600; color: var(--text-secondary);
-            background: var(--bg-card); border: 1px solid var(--border-subtle);
-            border-radius: 20px; padding: 5px 14px; white-space: nowrap;
+            font-size: 12px; font-weight: 700; color: var(--accent);
+            background: var(--accent-bg); border: 1px solid rgba(129,140,248,0.15);
+            border-radius: 20px; padding: 6px 16px;
           }
 
-          .log-card {
+          .page-header { margin-bottom: 24px; }
+          .page-header h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; }
+          .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+          .terminal {
             background: var(--bg-surface); border: 1px solid var(--border-subtle);
             border-radius: var(--radius); overflow: hidden;
-            box-shadow: var(--shadow-card);
+            box-shadow: var(--shadow-float);
           }
-
-          .log-card-header {
+          .terminal-bar {
             background: var(--bg-card); border-bottom: 1px solid var(--border-subtle);
             padding: 14px 20px; display: flex; align-items: center; gap: 8px;
           }
-          .dot { width: 12px; height: 12px; border-radius: 50%; transition: all 0.2s; }
-          .dot-red { background: #ff5f57; }
-          .dot-yellow { background: #ffbd2e; }
-          .dot-green { background: #28c840; }
-          .log-card-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 6px; }
+          .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+          .term-dot-r { background: #ff5f57; }
+          .term-dot-y { background: #ffbd2e; }
+          .term-dot-g { background: #28c840; }
+          .term-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 8px; font-family: var(--font-mono); }
 
           .log-body {
-            padding: 18px 20px; max-height: 560px; overflow-y: auto;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 12.5px; line-height: 1.8;
+            padding: 20px; max-height: 520px; overflow-y: auto;
+            font-family: var(--font-mono); font-size: 12.5px; line-height: 1.9;
           }
-          .log-body::-webkit-scrollbar { width: 6px; }
+          .log-body::-webkit-scrollbar { width: 5px; }
           .log-body::-webkit-scrollbar-track { background: transparent; }
-          .log-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-          .log-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+          .log-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+          .log-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
-          .log-entry { display: block; padding: 2px 0; white-space: pre-wrap; word-break: break-all; }
-          .log-entry.error { color: #f87171; }
-          .log-entry.warn { color: var(--yellow); }
+          .log-entry { display: block; padding: 1px 0; white-space: pre-wrap; word-break: break-all; }
+          .log-entry.error { color: var(--red); }
+          .log-entry.warn { color: var(--amber); }
           .log-entry.success { color: var(--green); }
-          .log-entry.control { color: var(--blue); }
+          .log-entry.control { color: var(--accent); }
           .log-entry.default { color: var(--text-secondary); }
 
-          .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
-
-          .refresh-bar {
-            display: flex; align-items: center; justify-content: flex-end;
-            gap: 8px; margin-top: 14px; font-size: 12px; color: var(--text-muted);
-          }
-          .refresh-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--green); animation: pulse-glow 2s infinite;
-          }
+          .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 13px; font-family: inherit; }
+          .empty-state span { font-size: 32px; display: block; margin-bottom: 12px; opacity: 0.3; }
 
           .console-row {
             display: flex; align-items: center;
             border-top: 1px solid var(--border-subtle);
-            background: var(--bg-deep); padding: 12px 20px; gap: 12px;
+            background: var(--bg-deep); padding: 14px 20px; gap: 12px;
           }
           .console-prompt {
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 14px; color: var(--green); font-weight: 700;
-            flex-shrink: 0; user-select: none;
+            font-family: var(--font-mono); font-size: 15px;
+            color: var(--accent); font-weight: 800; flex-shrink: 0; user-select: none;
           }
           .console-input {
             flex: 1; background: transparent; border: none; outline: none;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 12.5px; color: var(--text-primary); caret-color: var(--green);
+            font-family: var(--font-mono); font-size: 13px;
+            color: var(--text-primary); caret-color: var(--accent);
           }
           .console-input::placeholder { color: var(--text-muted); }
-
           .console-send {
-            background: var(--green-bg); border: 1px solid rgba(34,197,94,0.3);
-            color: var(--green); font-size: 12px; font-weight: 600;
-            padding: 6px 16px; border-radius: 8px; cursor: pointer;
+            background: var(--accent-bg); border: 1px solid rgba(129,140,248,0.25);
+            color: var(--accent); font-size: 12px; font-weight: 700;
+            padding: 8px 18px; border-radius: var(--radius-sm); cursor: pointer;
             font-family: inherit; transition: all 0.25s; flex-shrink: 0;
           }
-          .console-send:hover { background: rgba(34,197,94,0.15); box-shadow: 0 2px 12px rgba(34,197,94,0.15); }
-          .console-send:disabled { opacity: 0.4; cursor: default; }
+          .console-send:hover { background: rgba(129,140,248,0.12); box-shadow: 0 2px 16px var(--accent-glow); }
+          .console-send:disabled { opacity: 0.3; cursor: default; }
 
           .console-wrap { position: relative; }
-
           .cmd-suggestions {
             display: none; position: absolute; bottom: calc(100% + 8px);
             left: 12px; right: 12px;
             background: var(--bg-card); border: 1px solid var(--border-accent);
             border-radius: var(--radius-sm); overflow: hidden;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 10;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 10;
           }
           .cmd-suggestions.visible { display: block; animation: fadeIn 0.15s ease-out; }
-
           .cmd-item {
             display: flex; align-items: baseline; gap: 14px;
             padding: 10px 18px; cursor: pointer;
@@ -807,108 +832,96 @@ app.get("/logs", (req, res) => {
           }
           .cmd-item:last-child { border-bottom: none; }
           .cmd-item:hover, .cmd-item.active { background: var(--bg-elevated); }
-          .cmd-name {
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 12.5px; font-weight: 700; color: var(--green);
-            flex-shrink: 0; min-width: 90px;
-          }
+          .cmd-name { font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; color: var(--accent); flex-shrink: 0; min-width: 90px; }
           .cmd-desc { font-size: 12px; color: var(--text-muted); }
 
-          footer { margin-top: 36px; text-align: center; }
-          footer p { font-size: 11px; color: var(--text-muted); opacity: 0.5; }
-</style>
+          .refresh-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 16px; font-size: 12px; color: var(--text-muted); gap: 8px;
+          }
+          .refresh-indicator { display: flex; align-items: center; gap: 6px; }
+          .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 2s infinite; }
+
+          footer { margin-top: 40px; text-align: center; }
+          footer p { font-size: 11px; color: var(--text-muted); opacity: 0.3; }
+        </style>
       </head>
       <body>
         <main>
-          <a href="/" class="back-btn">&#8592; Back to Dashboard</a>
-
-          <div class="page-header">
-            <div class="page-header-left">
-              <h1>Bot Logs</h1>
-              <p>Live output from the AFK bot</p>
-            </div>
-            <span class="badge">${logCount} ${logCount === 1 ? "entry" : "entries"}</span>
+          <div class="top-bar">
+            <a href="/" class="back-link">← Dashboard</a>
+            <span class="badge">${logCount} ${logCount === 1 ? 'entry' : 'entries'}</span>
           </div>
 
-          <div class="log-card">
-            <div class="log-card-header">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
-              <span class="log-card-title">bot.log</span>
+          <div class="page-header">
+            <h1>Live Logs</h1>
+            <p>Real-time output from the AFK bot</p>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="term-dot term-dot-r"></span>
+              <span class="term-dot term-dot-y"></span>
+              <span class="term-dot term-dot-g"></span>
+              <span class="term-title">bot.log</span>
             </div>
             <div class="log-body" id="log-body">
               ${logCount === 0
-                ? `<div class="empty-state">No log entries yet. Start the bot to see output.</div>`
-                : logs.map((l) => {
+                ? '<div class="empty-state"><span>◇</span>No log entries yet.<br>Start the bot to see output.</div>'
+                : logs.map(l => {
                     const escaped = escapeHTML(l);
-                    const lower = l.toLowerCase();
-                    let cls = "default";
-                    if (lower.includes("error") || lower.includes("fail")) cls = "error";
-                    else if (lower.includes("warn")) cls = "warn";
-                    else if (lower.includes("[control]")) cls = "control";
-                    else if (lower.includes("connect") || lower.includes("join") || lower.includes("spawn")) cls = "success";
-                    return `<span class="log-entry ${cls}">${escaped}</span>`;
-                  }).join("")
+                    const lower = escaped.toLowerCase();
+                    let cls = 'default';
+                    if (lower.includes('error') || lower.includes('kicked') || lower.includes('fail')) cls = 'error';
+                    else if (lower.includes('warn') || lower.includes('throttl')) cls = 'warn';
+                    else if (lower.includes('success') || lower.includes('spawned') || lower.includes('connected') || lower.includes('[+]')) cls = 'success';
+                    else if (lower.includes('[console]') || lower.includes('[control]')) cls = 'control';
+                    return '<span class="log-entry ' + cls + '">' + escaped + '</span>';
+                  }).join('\n')
               }
             </div>
             <div class="console-wrap">
-              <div class="cmd-suggestions" id="cmd-suggestions"></div>
+              <div id="cmd-suggestions" class="cmd-suggestions"></div>
               <div class="console-row">
-                <span class="console-prompt">&gt;</span>
-                <input
-                  id="console-input"
-                  class="console-input"
-                  type="text"
-                  placeholder="Type / for commands, or any message…"
-                  autocomplete="off"
-                  spellcheck="false"
-                >
+                <span class="console-prompt">❯</span>
+                <input id="console-input" class="console-input" placeholder="Type a command… ( /help for list )" autocomplete="off" spellcheck="false">
                 <button id="console-send" class="console-send">Send</button>
               </div>
             </div>
           </div>
 
           <div class="refresh-bar">
-            <span class="refresh-dot"></span>
-            <span id="refresh-label">Auto-refreshing every 5 seconds</span>
+            <div class="refresh-indicator">
+              <span class="refresh-dot"></span>
+              <span id="refresh-label">Auto-refreshing every 5s</span>
+            </div>
           </div>
 
-          <footer>
-            <p>AFK Bot Dashboard &middot; ${config.name}</p>
-          </footer>
+          <footer><p>FluxAFK &middot; ${config.name}</p></footer>
         </main>
 
         <script>
           (function() {
-            var logBody  = document.getElementById('log-body');
-            var input    = document.getElementById('console-input');
-            var sendBtn  = document.getElementById('console-send');
-            var label    = document.getElementById('refresh-label');
-            var sugBox   = document.getElementById('cmd-suggestions');
-            var refreshTimer = null;
-            var typing = false;
-            var activeIdx = -1;
-
             var COMMANDS = [
-              { name: '/help',   desc: 'Show all available commands' },
-              { name: '/pos',    desc: "Show bot's current coordinates" },
-              { name: '/status', desc: 'Show connection status & uptime' },
-              { name: '/list',   desc: 'List players on the server' },
-              { name: '/say',    desc: 'Send a chat message in-game' },
+              { name: '/help',   desc: 'Show available commands' },
+              { name: '/pos',    desc: 'Show bot coordinates' },
+              { name: '/status', desc: 'Show connection status' },
+              { name: '/list',   desc: 'Ask server for player list' },
+              { name: '/say',    desc: 'Send a chat message in-game' }
             ];
 
-            function scrollBottom() {
-              if (logBody) logBody.scrollTop = logBody.scrollHeight;
-            }
+            var logBody   = document.getElementById('log-body');
+            var input     = document.getElementById('console-input');
+            var sendBtn   = document.getElementById('console-send');
+            var sugBox    = document.getElementById('cmd-suggestions');
+            var label     = document.getElementById('refresh-label');
+            var refreshTimer, typing = false, activeIdx = -1;
 
+            function scrollBottom() { if (logBody) logBody.scrollTop = logBody.scrollHeight; }
             function scheduleRefresh() {
               clearTimeout(refreshTimer);
-              if (!typing) {
-                refreshTimer = setTimeout(function() { location.reload(); }, 5000);
-              }
+              if (!typing) refreshTimer = setTimeout(function() { location.reload(); }, 5000);
             }
-
             function appendLocalEntry(text, cls) {
               var span = document.createElement('span');
               span.className = 'log-entry ' + (cls || 'control');
@@ -916,82 +929,35 @@ app.get("/logs", (req, res) => {
               logBody.appendChild(span);
               scrollBottom();
             }
-
-            function hideSuggestions() {
-              sugBox.classList.remove('visible');
-              sugBox.innerHTML = '';
-              activeIdx = -1;
-            }
-
+            function hideSuggestions() { sugBox.classList.remove('visible'); sugBox.innerHTML = ''; activeIdx = -1; }
             function setActive(idx) {
-              var items = sugBox.querySelectorAll('.cmd-item');
-              items.forEach(function(el, i) {
-                el.classList.toggle('active', i === idx);
-              });
+              sugBox.querySelectorAll('.cmd-item').forEach(function(el, i) { el.classList.toggle('active', i === idx); });
               activeIdx = idx;
             }
-
             function showSuggestions(val) {
-              var query = val.toLowerCase();
-              var matches = COMMANDS.filter(function(c) {
-                return c.name.startsWith(query);
-              });
-
+              var q = val.toLowerCase();
+              var matches = COMMANDS.filter(function(c) { return c.name.startsWith(q); });
               if (!matches.length) { hideSuggestions(); return; }
-
-              sugBox.innerHTML = matches.map(function(c, i) {
-                return '<div class="cmd-item" data-cmd="' + c.name + '">' +
-                  '<span class="cmd-name">' + c.name + '</span>' +
-                  '<span class="cmd-desc">' + c.desc + '</span>' +
-                '</div>';
+              sugBox.innerHTML = matches.map(function(c) {
+                return '<div class="cmd-item" data-cmd="' + c.name + '"><span class="cmd-name">' + c.name + '</span><span class="cmd-desc">' + c.desc + '</span></div>';
               }).join('');
-
               sugBox.querySelectorAll('.cmd-item').forEach(function(el) {
-                el.addEventListener('mousedown', function(e) {
-                  e.preventDefault();
-                  input.value = el.dataset.cmd + ' ';
-                  hideSuggestions();
-                  input.focus();
-                });
+                el.addEventListener('mousedown', function(e) { e.preventDefault(); input.value = el.dataset.cmd + ' '; hideSuggestions(); input.focus(); });
               });
-
               activeIdx = -1;
               sugBox.classList.add('visible');
             }
 
             input.addEventListener('input', function() {
-              var val = input.value;
-              if (val.startsWith('/')) {
-                showSuggestions(val);
-              } else {
-                hideSuggestions();
-              }
+              if (input.value.startsWith('/')) showSuggestions(input.value); else hideSuggestions();
             });
-
             input.addEventListener('keydown', function(e) {
               var items = sugBox.querySelectorAll('.cmd-item');
               if (sugBox.classList.contains('visible') && items.length) {
-                if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  setActive(Math.min(activeIdx + 1, items.length - 1));
-                  return;
-                }
-                if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  setActive(Math.max(activeIdx - 1, 0));
-                  return;
-                }
-                if (e.key === 'Tab' || (e.key === 'Enter' && activeIdx >= 0)) {
-                  e.preventDefault();
-                  var chosen = items[activeIdx >= 0 ? activeIdx : 0];
-                  input.value = chosen.dataset.cmd + ' ';
-                  hideSuggestions();
-                  return;
-                }
-                if (e.key === 'Escape') {
-                  hideSuggestions();
-                  return;
-                }
+                if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(activeIdx + 1, items.length - 1)); return; }
+                if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(activeIdx - 1, 0)); return; }
+                if (e.key === 'Tab' || (e.key === 'Enter' && activeIdx >= 0)) { e.preventDefault(); input.value = items[activeIdx >= 0 ? activeIdx : 0].dataset.cmd + ' '; hideSuggestions(); return; }
+                if (e.key === 'Escape') { hideSuggestions(); return; }
               }
               if (e.key === 'Enter') sendCommand();
             });
@@ -999,49 +965,18 @@ app.get("/logs", (req, res) => {
             function sendCommand() {
               var cmd = input.value.trim();
               if (!cmd) return;
-              hideSuggestions();
-              input.value = '';
-              sendBtn.disabled = true;
+              hideSuggestions(); input.value = ''; sendBtn.disabled = true;
               appendLocalEntry('> ' + cmd, 'control');
-
-              fetch('/command', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ command: cmd })
-              })
-              .then(function(r) { return r.json(); })
-              .then(function(data) {
-                if (data.msg) {
-                  data.msg.split('\\n').forEach(function(line) {
-                    appendLocalEntry(line, data.success ? 'default' : 'error');
-                  });
-                }
-              })
-              .catch(function() {
-                appendLocalEntry('Failed to send command.', 'error');
-              })
-              .finally(function() {
-                sendBtn.disabled = false;
-                input.focus();
-                scheduleRefresh();
-              });
+              fetch('/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: cmd }) })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { if (data.msg) data.msg.split('\\n').forEach(function(l) { appendLocalEntry(l, data.success ? 'default' : 'error'); }); })
+                .catch(function() { appendLocalEntry('Failed to send command.', 'error'); })
+                .finally(function() { sendBtn.disabled = false; input.focus(); scheduleRefresh(); });
             }
 
             sendBtn.addEventListener('click', sendCommand);
-
-            input.addEventListener('focus', function() {
-              typing = true;
-              clearTimeout(refreshTimer);
-              label.textContent = 'Auto-refresh paused while typing';
-            });
-            input.addEventListener('blur', function() {
-              setTimeout(function() {
-                hideSuggestions();
-                typing = false;
-                label.textContent = 'Auto-refreshing every 5 seconds';
-                scheduleRefresh();
-              }, 150);
-            });
+            input.addEventListener('focus', function() { typing = true; clearTimeout(refreshTimer); label.textContent = 'Paused while typing'; });
+            input.addEventListener('blur', function() { setTimeout(function() { hideSuggestions(); typing = false; label.textContent = 'Auto-refreshing every 5s'; scheduleRefresh(); }, 150); });
 
             scrollBottom();
             scheduleRefresh();
